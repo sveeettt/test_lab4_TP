@@ -4,6 +4,10 @@ project(MusicSalon)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Флаги покрытия для всех целей
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+
 # Находим SQLite
 find_package(SQLite3 REQUIRED)
 
@@ -33,14 +37,6 @@ target_link_libraries(music_salon MusicSalonLib)
 # Исполняемый файл тестов
 add_executable(run_tests tests/test_music_salon.cpp)
 target_link_libraries(run_tests MusicSalonLib gtest_main)
-
-# Флаги покрытия для Debug режима
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(MusicSalonLib PRIVATE -O0 -g --coverage)
-    target_link_options(MusicSalonLib PRIVATE --coverage)
-    target_compile_options(run_tests PRIVATE -O0 -g --coverage)
-    target_link_options(run_tests PRIVATE --coverage)
-endif()
 
 # Регистрируем тесты
 enable_testing()
