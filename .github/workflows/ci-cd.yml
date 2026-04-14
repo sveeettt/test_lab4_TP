@@ -37,13 +37,27 @@ jobs:
     - name: Generate coverage report
       run: |
         cd build
-        lcov --capture --directory . --output-file coverage.info --no-external
-        lcov --remove coverage.info '/usr/*' --output-file coverage.info
-        lcov --remove coverage.info '*/tests/*' --output-file coverage.info
-        lcov --remove coverage.info '*/gtest/*' --output-file coverage.info
+        lcov --capture --directory . --output-file coverage.info --no-external --ignore-errors unused
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info --ignore-errors unused
+        lcov --remove coverage.info '*/tests/*' --output-file coverage.info --ignore-errors unused
+        lcov --remove coverage.info '*/gtest/*' --output-file coverage.info --ignore-errors unused
+        lcov --remove coverage.info '*/_deps/*' --output-file coverage.info --ignore-errors unused
         lcov --list coverage.info
 
-    # 7. Отправляем в Codecov
+    # 7. Генерируем HTML отчёт
+    - name: Generate HTML report
+      run: |
+        cd build
+        genhtml coverage.info --output-directory coverage_report --ignore-errors source
+
+    # 8. Сохраняем HTML отчёт как артефакт
+    - name: Upload HTML report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report-html
+        path: build/coverage_report/
+
+    # 9. Отправляем отчёт в Codecov
     - name: Upload to Codecov
       uses: codecov/codecov-action@v4
       with:
@@ -53,9 +67,6 @@ jobs:
         name: music-salon-coverage
         fail_ci_if_error: false
 
-    # 8. Сохраняем отчёт как артефакт
-    - name: Upload HTML report
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: build/coverage_report/
+    # 10. Проверка успешности
+    - name: Done
+      run: echo "✅ Build, tests and coverage report completed!"
