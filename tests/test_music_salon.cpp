@@ -134,7 +134,7 @@ TEST_F(AuthorizeTests, ManagerCannotAccessUser) {
 }
 
 // ============================================================
-// ТЕСТЫ ДЛЯ БАЗЫ ДАННЫХ (Database) - 4 теста
+// ТЕСТЫ ДЛЯ БАЗЫ ДАННЫХ (Database) - 3 теста
 // ============================================================
 
 class DatabaseTests : public ::testing::Test {
@@ -173,7 +173,6 @@ protected:
     
     void SetUp() override {
         sqlite3_open(":memory:", &db);
-        // Создаём тестовые таблицы
         const char* sql = R"(
             CREATE TABLE CD_DISC (disc_id INTEGER PRIMARY KEY, price REAL);
             CREATE TABLE TRANSACTION (
@@ -189,6 +188,7 @@ protected:
             INSERT INTO CD_DISC VALUES (1, 19.99);
             INSERT INTO TRANSACTION VALUES (1, '2024-01-01', 'income', 1, 100);
             INSERT INTO TRANSACTION VALUES (2, '2024-02-01', 'sale', 1, 30);
+            INSERT INTO STOCK VALUES (1, 100, 30, 70);
         )";
         sqlite3_exec(db, sql, nullptr, nullptr, nullptr);
     }
@@ -337,7 +337,12 @@ protected:
     void SetUp() override {
         sqlite3_open(":memory:", &db);
         const char* sql = R"(
-            CREATE TABLE TRANSACTION (trans_id INTEGER PRIMARY KEY, operation_type TEXT, disc_id INTEGER, quantity INTEGER);
+            CREATE TABLE TRANSACTION (
+                trans_id INTEGER PRIMARY KEY,
+                operation_type TEXT,
+                disc_id INTEGER,
+                quantity INTEGER
+            );
             CREATE TABLE STOCK (disc_id INTEGER, remaining INTEGER);
             INSERT INTO STOCK VALUES (1, 50);
         )";
