@@ -1,0 +1,13 @@
+.vs/
+*.suo
+*.user
+*.db
+bin/
+build/
+*.exe
+*.o
+*.gcda
+*.gcno
+*.gcov
+coverage_report/
+.DS_Store
